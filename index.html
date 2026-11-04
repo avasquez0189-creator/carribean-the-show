@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caribbean Baseball Show</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#081828;
+color:white;
+margin:0;
+padding:15px;
+}
+
+h1,h2,h3{
+text-align:center;
+}
+
+.screen{
+display:none;
+}
+
+.active{
+display:block;
+}
+
+.card{
+background:#16324f;
+padding:15px;
+border-radius:10px;
+margin:10px 0;
+cursor:pointer;
+}
+
+.card:hover{
+background:#1f4a73;
+}
+
+button{
+background:#0d6efd;
+color:white;
+border:none;
+padding:10px;
+border-radius:8px;
+margin:5px;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+td,th{
+border:1px solid #36506a;
+padding:8px;
+}
+
+.green{
+background:#198754;
+padding:10px;
+border-radius:10px;
+margin-top:10px;
+}
+
+.red{
+background:#dc3545;
+padding:10px;
+border-radius:10px;
+margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="home" class="screen active">
+
+<h1>🏆 Caribbean Baseball Show</h1>
+
+<button onclick="show('leagueScreen')">
+Jugar
+</button>
+
+<button onclick="saveGame()">
+Guardar
+</button>
+
+<button onclick="loadGame()">
+Cargar
+</button>
+
+</div>
+
+<div id="leagueScreen" class="screen">
+
+<h2>Selecciona Liga</h2>
+
+<div class="card" onclick="selectLeague('RD')">
+🇩🇴 República Dominicana
+</div>
+
+<div class="card" onclick="selectLeague('PR')">
+🇵🇷 Puerto Rico
+</div>
+
+<div class="card" onclick="selectLeague('MX')">
+🇲🇽 México
+</div>
+
+<div class="card" onclick="selectLeague('VE')">
+🇻🇪 Venezuela
+</div>
+
+<button onclick="show('home')">
+Volver
+</button>
+
+</div>
+
+<div id="teamScreen" class="screen">
+
+<h2 id="leagueTitle"></h2>
+
+<div id="teamList"></div>
+
+<button onclick="show('leagueScreen')">
+Volver
+</button>
+
+</div>
+
+<div id="hubScreen" class="screen">
+
+<h2 id="teamName"></h2>
+
+<button onclick="playGame()">
+⚾ Jugar Partido
+</button>
+
+<button onclick="showStandings()">
+📊 Posiciones
+</button>
+
+<button onclick="showRoster()">
+👥 Roster
+</button>
+
+<button onclick="showPlayoffs()">
+🏆 Playoffs
+</button>
+
+<button onclick="showSeries()">
+🌴 Serie del Caribe
+</button>
+
+<div id="content"></div>
+
+</div>
+
+<script>
+
+const leagues = {
+
+RD:[
+"Licey",
+"Águilas",
+"Escogido",
+"Estrellas",
+"Gigantes",
+"Toros"
+],
+
+PR:[
+"Caguas",
+"Santurce",
+"Mayagüez",
+"Ponce"
+],
+
+MX:[
+"Naranjeros",
+"Tomateros",
+"Charros",
+"Venados"
+],
+
+VE:[
+"Caracas",
+"Magallanes",
+"Tiburones",
+"Cardenales"
+]
+
+};
+
+let game={
+
+league:null,
+team:null,
+
+wins:0,
+losses:0
+
+};
+
+function show(id){
+
+document
+.querySelectorAll('.screen')
+.forEach(x=>x.classList.remove('active'));
+
+document
+.getElementById(id)
+.classList.add('active');
+
+}
+
+function selectLeague(code){
+
+game.league=code;
+
+leagueTitle.textContent=
+"Liga "+code;
+
+let html="";
+
+leagues[code].forEach(team=>{
+
+html+=`
+<div class="card"
+onclick="selectTeam('${team}')">
+${team}
+</div>
+`;
+
+});
+
+teamList.innerHTML=html;
+
+show("teamScreen");
+
+}
+
+function selectTeam(team){
+
+game.team=team;
+
+teamName.textContent=team;
+
+show("hubScreen");
+
+showRoster();
+
+}
+
+function showRoster(){
+
+let html=`
+<h3>Roster</h3>
+
+<table>
+
+<tr>
+<th>#</th>
+<th>Jugador</th>
+<th>OVR</th>
+</tr>
+`;
+
+for(let i=1;i<=9;i++){
+
+html+=`
+<tr>
+<td>${i}</td>
+<td>Jugador ${i}</td>
+<td>${70+i}</td>
+</tr>
+`;
+
+}
+
+html+="</table>";
+
+content.innerHTML=html;
+
+}
+
+function playGame(){
+
+let myRuns=
+Math.floor(Math.random()*10);
+
+let oppRuns=
+Math.floor(Math.random()*10);
+
+if(myRuns>=oppRuns){
+
+game.wins++;
+
+content.innerHTML=`
+<div class="green">
+
+Victoria
+
+<br><br>
+
+${game.team}
+${myRuns}
+
+-
+
+${oppRuns}
+
+Rival
+
+</div>
+`;
+
+}else{
+
+game.losses++;
+
+content.innerHTML=`
+<div class="red">
+
+Derrota
+
+<br><br>
+
+${game.team}
+${myRuns}
+
+-
+
+${oppRuns}
+
+Rival
+
+</div>
+`;
+
+}
+
+}
+
+function showStandings(){
+
+content.innerHTML=`
+
+<h3>Posiciones</h3>
+
+<table>
+
+<tr>
+<th>Equipo</th>
+<th>G</th>
+<th>P</th>
+</tr>
+
+<tr>
+<td>${game.team}</td>
+<td>${game.wins}</td>
+<td>${game.losses}</td>
+</tr>
+
+</table>
+
+`;
+
+}
+
+function showPlayoffs(){
+
+let champion=
+leagues[game.league][
+Math.floor(
+Math.random()*
+leagues[game.league].length
+)
+];
+
+content.innerHTML=`
+
+<h3>Playoffs</h3>
+
+<div class="green">
+
+🏆 Campeón Liga
+
+<br><br>
+
+${champion}
+
+</div>
+
+`;
+
+}
+
+function showSeries(){
+
+let teams=[
+
+"🇩🇴 RD",
+"🇵🇷 PR",
+"🇲🇽 MX",
+"🇻🇪 VE"
+
+];
+
+let winner=
+teams[
+Math.floor(Math.random()*4)
+];
+
+content.innerHTML=`
+
+<h3>Serie del Caribe</h3>
+
+<div class="green">
+
+🏆 Campeón
+
+<br><br>
+
+${winner}
+
+</div>
+
+`;
+
+}
+
+function saveGame(){
+
+localStorage.setItem(
+"CBS_SAVE",
+JSON.stringify(game)
+);
+
+alert("Partida guardada");
+
+}
+
+function loadGame(){
+
+const save=
+localStorage.getItem(
+"CBS_SAVE"
+);
+
+if(!save){
+
+alert("No existe partida");
+
+return;
+
+}
+
+game=
+JSON.parse(save);
+
+alert(
+"Partida cargada: "
++game.team
+);
+
+show("hubScreen");
+
+teamName.textContent=
+game.team;
+
+showStandings();
+
+}
+
+</script>
+
+</body>
+</html>
